@@ -43,6 +43,18 @@
         android:layout_height="wrap_content"
         android:text="Update" />
 
+    <Button
+        android:id="@+id/btnDeleteDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Description" />
+
+    <Button
+        android:id="@+id/btnDeleteNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete note" />
+
     <TextView
         android:id="@+id/tvData"
         android:layout_width="match_parent"

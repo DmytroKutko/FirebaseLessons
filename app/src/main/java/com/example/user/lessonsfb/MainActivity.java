@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.SetOptions;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_DESCRIPTION = "description";
 
     private EditText etTitle, etDescription;
-    private Button btnSubmit, btnLoad, btnUpdate;
+    private Button btnSubmit, btnLoad, btnUpdate, btnDeleteDescription, btnDeleteNote;
     private TextView tvData;
 
     private FirebaseFirestore store;
@@ -63,12 +64,14 @@ public class MainActivity extends AppCompatActivity {
                     String description = documentSnapshot.getString(KEY_DESCRIPTION);
 
                     tvData.setText("Title: " + title + "\n" + "Description: " + description);
+                } else {
+                    tvData.setText("");
                 }
             }
         });
     }
 
-    private void initListener() {
+    public void initListener() {
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,9 +93,23 @@ public class MainActivity extends AppCompatActivity {
                 updateDescription(v);
             }
         });
+
+        btnDeleteDescription.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteDescription(v);
+            }
+        });
+
+        btnDeleteNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
-    private void initView() {
+    public void initView() {
         store = FirebaseFirestore.getInstance();
         noteRef = store.document("Notebook/First Note");
 
@@ -101,10 +118,20 @@ public class MainActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
         btnLoad = findViewById(R.id.btnLoad);
         btnUpdate = findViewById(R.id.btnUpdate);
+        btnDeleteDescription = findViewById(R.id.btnDeleteDescription);
+        btnDeleteNote = findViewById(R.id.btnDeleteNote);
         tvData = findViewById(R.id.tvData);
     }
 
-    private void saveNote(View v) {
+    public void deleteDescription(View v) {
+        noteRef.update(KEY_DESCRIPTION, FieldValue.delete());
+    }
+
+    public void deleteNote(View v){
+        noteRef.delete();
+    }
+
+    public void saveNote(View v) {
         String title = etTitle.getText().toString().trim();
         String description = etDescription.getText().toString().trim();
 
@@ -128,13 +155,13 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateDescription(View v){
+    public void updateDescription(View v){
         String description = etDescription.getText().toString().trim();
 
         noteRef.update(KEY_DESCRIPTION, description);
     }
 
-    private void loadNote(View v) {
+    public void loadNote(View v) {
         noteRef.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
