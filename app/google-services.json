@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "73845279585",
+    "firebase_url": "https://fir-b74f7.firebaseio.com",
+    "project_id": "fir-b74f7",
+    "storage_bucket": "fir-b74f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:73845279585:android:3e6f1f4a5954d557",
+        "android_client_info": {
+          "package_name": "com.example.user.lessonsfb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "73845279585-7l20o06dsu6n71fj236je0f77qdae6e7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user.lessonsfb",
+            "certificate_hash": "23d9c8a3cf9c8a7e3ef950090dc18ab9768aab7e"
+          }
+        },
+        {
+          "client_id": "73845279585-qfks1mm01u3jjeesg92h9l73hf2vic81.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnzUzjxdZkBtQth2iNOVUpHnivpUFtCs8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "73845279585-qfks1mm01u3jjeesg92h9l73hf2vic81.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
