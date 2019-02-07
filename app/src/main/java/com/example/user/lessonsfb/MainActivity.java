@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         btnDeleteNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                deleteNote(v);
             }
         });
     }
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         noteRef.update(KEY_DESCRIPTION, FieldValue.delete());
     }
 
-    public void deleteNote(View v){
+    public void deleteNote(View v) {
         noteRef.delete();
     }
 
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void updateDescription(View v){
+    public void updateDescription(View v) {
         String description = etDescription.getText().toString().trim();
 
         noteRef.update(KEY_DESCRIPTION, description);
