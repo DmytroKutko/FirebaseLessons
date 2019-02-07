@@ -1,8 +1,8 @@
 package com.example.user.lessonsfb;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +17,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_DESCRIPTION = "description";
 
     private EditText etTitle, etDescription;
-    private Button btnSubmit, btnLoad;
+    private Button btnSubmit, btnLoad, btnUpdate;
     private TextView tvData;
 
     private FirebaseFirestore store;
@@ -83,6 +83,13 @@ public class MainActivity extends AppCompatActivity {
                 loadNote(v);
             }
         });
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateDescription(v);
+            }
+        });
     }
 
     private void initView() {
@@ -93,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         etDescription = findViewById(R.id.etDescription);
         btnSubmit = findViewById(R.id.btnSubmit);
         btnLoad = findViewById(R.id.btnLoad);
+        btnUpdate = findViewById(R.id.btnUpdate);
         tvData = findViewById(R.id.tvData);
     }
 
@@ -118,6 +126,12 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "onFailure: " + e.toString());
                     }
                 });
+    }
+
+    private void updateDescription(View v){
+        String description = etDescription.getText().toString().trim();
+
+        noteRef.update(KEY_DESCRIPTION, description);
     }
 
     private void loadNote(View v) {

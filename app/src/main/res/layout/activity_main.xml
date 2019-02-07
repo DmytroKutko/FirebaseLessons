@@ -37,6 +37,12 @@
         android:layout_height="wrap_content"
         android:text="Load" />
 
+    <Button
+        android:id="@+id/btnUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update" />
+
     <TextView
         android:id="@+id/tvData"
         android:layout_width="match_parent"
