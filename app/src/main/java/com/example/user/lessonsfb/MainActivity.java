@@ -56,14 +56,14 @@ public class MainActivity extends AppCompatActivity {
         notebookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null){
+                if (e != null) {
                     Toast.makeText(MainActivity.this, "Exception Load", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "onEvent: " + e.toString());
                     return;
                 }
 
                 String data = "";
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Note note = documentSnapshot.toObject(Note.class);
                     note.setDocumentId(documentSnapshot.getId());
                     data += note.toString() + "\n";
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         String title = etTitle.getText().toString().trim();
         String description = etDescription.getText().toString().trim();
 
-        if (etPriority.length() == 0){
+        if (etPriority.length() == 0) {
             etPriority.setText("0");
         }
 
@@ -120,21 +120,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadNote(View v) {
         notebookRef.whereGreaterThanOrEqualTo("priority", 2)
-                .orderBy("priority", Query.Direction.DESCENDING)
-                .limit(3)
+                .orderBy("priority")
+                .orderBy("title")
+                .limit(2)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         String data = "";
 
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             Note note = documentSnapshot.toObject(Note.class);
                             note.setDocumentId(documentSnapshot.getId());
 
                             data += note.toString() + "\n";
                         }
                         tvData.setText(data);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, e.toString());
                     }
                 });
     }
