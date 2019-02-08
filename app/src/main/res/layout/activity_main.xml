@@ -25,6 +25,14 @@
         android:hint="Description"
         android:inputType="textPersonName" />
 
+    <EditText
+        android:id="@+id/etPriority"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Priority"
+        android:inputType="phone" />
+
     <Button
         android:id="@+id/btnAdd"
         android:layout_width="match_parent"

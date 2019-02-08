@@ -8,14 +8,16 @@ public class Note {
     private String title;
     private String description;
     private long unixTime;
+    private int priority;
 
     public Note() {
     }
 
-    public Note(String title, String description) {
+    public Note(String title, String description, int priority) {
         this.title = title;
         this.description = description;
         this.unixTime = System.currentTimeMillis();
+        this.priority = priority;
     }
 
     @Exclude
@@ -51,11 +53,20 @@ public class Note {
         this.unixTime = unixTime;
     }
 
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
     @Override
     public String toString() {
         return "Document ID: " + documentId + '\n' +
                 "Title: " + title + '\n' +
                 "Description: " + description + '\n' +
-                "UnixTime: " + unixTime + "\n";
+                "UnixTime: " + unixTime + "\n" +
+                "Priority: " + priority + "\n";
     }
 }
