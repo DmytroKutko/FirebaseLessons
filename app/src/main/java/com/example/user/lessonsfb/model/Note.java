@@ -1,11 +1,12 @@
 package com.example.user.lessonsfb.model;
 
+import com.google.firebase.firestore.Exclude;
+
 public class Note {
 
+    private String documentId;
     private String title;
-
     private String description;
-
     private long unixTime;
 
     public Note() {
@@ -15,6 +16,15 @@ public class Note {
         this.title = title;
         this.description = description;
         this.unixTime = System.currentTimeMillis();
+    }
+
+    @Exclude
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public String getTitle() {
@@ -43,10 +53,9 @@ public class Note {
 
     @Override
     public String toString() {
-        return "Note{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", unixTime=" + unixTime +
-                '}';
+        return "Document ID: " + documentId + '\n' +
+                "Title: " + title + '\n' +
+                "Description: " + description + '\n' +
+                "UnixTime: " + unixTime + "\n";
     }
 }
