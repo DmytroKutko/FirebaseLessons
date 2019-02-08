@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.user.lessonsfb.model.Note;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
@@ -60,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 if (documentSnapshot.exists()) {
-                    String title = documentSnapshot.getString(KEY_TITLE);
-                    String description = documentSnapshot.getString(KEY_DESCRIPTION);
-
-                    tvData.setText("Title: " + title + "\n" + "Description: " + description);
+                    Note note = documentSnapshot.toObject(Note.class);
+                    tvData.setText("Title: " + note.getTitle() +
+                            "\n" + "Description: " + note.getDescription() +
+                            '\n' + "Time created: " + note.getUnixTime());
                 } else {
                     tvData.setText("");
                 }
@@ -135,9 +136,7 @@ public class MainActivity extends AppCompatActivity {
         String title = etTitle.getText().toString().trim();
         String description = etDescription.getText().toString().trim();
 
-        Map<String, Object> note = new HashMap<>();
-        note.put(KEY_TITLE, title);
-        note.put(KEY_DESCRIPTION, description);
+        Note note = new Note(title, description);
 
         noteRef.set(note)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -167,12 +166,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
-                            String title = documentSnapshot.getString(KEY_TITLE);
-                            String description = documentSnapshot.getString(KEY_DESCRIPTION);
-
-//                            Map<String, Object> note = documentSnapshot.getData();
-
-                            tvData.setText("Title: " + title + "\n" + "Description: " + description);
+                            Note note = documentSnapshot.toObject(Note.class);
+                            tvData.setText("Title: " + note.getTitle() +
+                                    "\n" + "Description: " + note.getDescription() +
+                                    '\n' + "Time created: " + note.getUnixTime());
                         } else {
                             Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
                         }
