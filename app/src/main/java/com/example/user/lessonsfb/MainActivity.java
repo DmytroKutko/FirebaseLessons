@@ -1,7 +1,6 @@
 package com.example.user.lessonsfb;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -11,17 +10,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user.lessonsfb.model.Note;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -119,30 +119,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadNote(View v) {
-        notebookRef.whereGreaterThanOrEqualTo("priority", 2)
+        Task task1 = notebookRef.whereLessThan("priority", 2)
                 .orderBy("priority")
-                .orderBy("title")
-                .limit(2)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        String data = "";
+                .get();
 
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            Note note = documentSnapshot.toObject(Note.class);
-                            note.setDocumentId(documentSnapshot.getId());
+        Task task2 = notebookRef.whereGreaterThan("priority", 3)
+                .orderBy("priority")
+                .get();
 
-                            data += note.toString() + "\n";
-                        }
-                        tvData.setText(data);
+        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(task1, task2);
+        allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
+            @Override
+            public void onSuccess(List<QuerySnapshot> querySnapshots) {
+                StringBuilder data = new StringBuilder();
+
+                for (QuerySnapshot queryDocumentSnapshots : querySnapshots) {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Note note = documentSnapshot.toObject(Note.class);
+                        note.setDocumentId(documentSnapshot.getId());
+                        data.append(note.toString()).append("\n");
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, e.toString());
-                    }
-                });
+                }
+                tvData.setText(data.toString());
+            }
+        });
     }
 }
