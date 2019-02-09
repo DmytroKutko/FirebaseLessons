@@ -2,35 +2,23 @@ package com.example.user.lessonsfb;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.user.lessonsfb.model.Note;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.List;
-
-import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
-    private static final String KEY_TITLE = "title";
-    private static final String KEY_DESCRIPTION = "description";
 
     private EditText etTitle, etDescription, etPriority;
     private Button btnAdd, btnLoad;
@@ -38,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseFirestore store;
     private CollectionReference notebookRef;
-    private DocumentReference noteRef;
+    private DocumentSnapshot lastResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,30 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initListener();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        notebookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Toast.makeText(MainActivity.this, "Exception Load", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onEvent: " + e.toString());
-                    return;
-                }
-
-                String data = "";
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Note note = documentSnapshot.toObject(Note.class);
-                    note.setDocumentId(documentSnapshot.getId());
-                    data += note.toString() + "\n";
-                }
-                tvData.setText(data);
-            }
-        });
     }
 
     public void initListener() {
@@ -85,14 +49,13 @@ public class MainActivity extends AppCompatActivity {
         btnLoad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadNote(v);
+                loadNotes(v);
             }
         });
     }
 
     public void initView() {
         store = FirebaseFirestore.getInstance();
-        noteRef = store.document("Notebook/First Note");
         notebookRef = store.collection("Notebook");
 
         etTitle = findViewById(R.id.etTitle);
@@ -118,30 +81,36 @@ public class MainActivity extends AppCompatActivity {
         notebookRef.add(note);
     }
 
-    public void loadNote(View v) {
-        Task task1 = notebookRef.whereLessThan("priority", 2)
-                .orderBy("priority")
-                .get();
+    public void loadNotes(View v) {
+        Query query;
 
-        Task task2 = notebookRef.whereGreaterThan("priority", 3)
-                .orderBy("priority")
-                .get();
+        if (lastResult == null) {
+            query = notebookRef.orderBy("priority")
+                    .limit(3);
+        } else {
+            query = notebookRef.orderBy("priority")
+                    .startAfter(lastResult)
+                    .limit(3);
+        }
 
-        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(task1, task2);
-        allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
-            @Override
-            public void onSuccess(List<QuerySnapshot> querySnapshots) {
-                StringBuilder data = new StringBuilder();
-
-                for (QuerySnapshot queryDocumentSnapshots : querySnapshots) {
-                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                        Note note = documentSnapshot.toObject(Note.class);
-                        note.setDocumentId(documentSnapshot.getId());
-                        data.append(note.toString()).append("\n");
+        query.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        StringBuilder data = new StringBuilder();
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                            Note note = queryDocumentSnapshot.toObject(Note.class);
+                            note.setDocumentId(queryDocumentSnapshot.getId());
+                            data.append(note.toString());
+                        }
+                        if (queryDocumentSnapshots.size() > 0) {
+                            data.append("\n_________________________________\n");
+                            tvData.append(data);
+                            lastResult = queryDocumentSnapshots.getDocuments()
+                                    .get(queryDocumentSnapshots.size() - 1);
+                        }
                     }
-                }
-                tvData.setText(data.toString());
-            }
-        });
+                });
+
     }
 }
