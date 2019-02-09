@@ -2,6 +2,7 @@ package com.example.user.lessonsfb;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,11 +11,16 @@ import android.widget.TextView;
 import com.example.user.lessonsfb.model.Note;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,15 +43,51 @@ public class MainActivity extends AppCompatActivity {
         initListener();
     }
 
-    public void initListener() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        notebookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.d(TAG, "onEvent: " + e.toString());
+                    return;
+                }
+                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                    DocumentSnapshot documentSnapshot = dc.getDocument();
+                    String id = documentSnapshot.getId();
+                    int oldIndex = dc.getOldIndex();
+                    int newIndex = dc.getNewIndex();
 
+                    switch (dc.getType()) {
+                        case ADDED:
+                            tvData.append("\nAdded: " + id +
+                                    "\nOldIndex: " + oldIndex +
+                                    "\nNewIndex: " + newIndex);
+                            break;
+                        case MODIFIED:
+                            tvData.append("\nModified: " + id +
+                                    "\nOldIndex: " + oldIndex +
+                                    "\nNewIndex: " + newIndex);
+                            break;
+                        case REMOVED:
+                            tvData.append("\nRemoved: " + id +
+                                    "\nOldIndex: " + oldIndex +
+                                    "\nNewIndex: " + newIndex);
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+    public void initListener() {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addNote(v);
             }
         });
-
         btnLoad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
