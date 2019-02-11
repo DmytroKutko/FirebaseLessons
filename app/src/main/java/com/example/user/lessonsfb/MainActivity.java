@@ -36,12 +36,6 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initListener();
-        updateNestedValue();
-    }
-
-    private void updateNestedValue() {
-        notebookRef.document("UkeaUvnTnwpPLDsQKf0k")
-                .update("tags.tag1.nested1.nested2", "Nested value");
     }
 
     public void initListener() {
@@ -91,11 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
         Note note = new Note(title, description, priority, tags);
 
-        notebookRef.add(note);
+        notebookRef.document("SlPl1L5vFoMWaz45uCde")
+                .collection("Child Notes").add(note);
     }
 
     public void loadNotes(View v) {
-        notebookRef.whereEqualTo("tags.tag2", true).get()
+        notebookRef.document("SlPl1L5vFoMWaz45uCde")
+                .collection("Child Notes")
+                .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
