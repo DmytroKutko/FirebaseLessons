@@ -3,6 +3,7 @@ package com.example.user.lessonsfb.model;
 import com.google.firebase.firestore.Exclude;
 
 import java.util.List;
+import java.util.Map;
 
 public class Note {
 
@@ -11,12 +12,12 @@ public class Note {
     private String description;
     private long unixTime;
     private int priority;
-    List<String> tags;
+    Map<String, Boolean> tags;
 
     public Note() {
     }
 
-    public Note(String title, String description, int priority, List<String> tags) {
+    public Note(String title, String description, int priority, Map<String, Boolean> tags) {
         this.title = title;
         this.description = description;
         this.unixTime = System.currentTimeMillis();
@@ -65,11 +66,11 @@ public class Note {
         this.priority = priority;
     }
 
-    public List<String> getTags() {
+    public Map<String, Boolean> getTags() {
         return tags;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(Map<String, Boolean> tags) {
         this.tags = tags;
     }
 

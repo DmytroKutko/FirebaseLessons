@@ -15,8 +15,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,13 +36,12 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initListener();
-        updateArray();
+        updateNestedValue();
     }
 
-    private void updateArray() {
-        notebookRef.document("x6R9ypYKN5c1ktBi875d")
-//                .update("tags", FieldValue.arrayUnion("new tag"))
-                .update("tags", FieldValue.arrayRemove("new tag"));
+    private void updateNestedValue() {
+        notebookRef.document("UkeaUvnTnwpPLDsQKf0k")
+                .update("tags.tag1.nested1.nested2", "Nested value");
     }
 
     public void initListener() {
@@ -85,7 +84,10 @@ public class MainActivity extends AppCompatActivity {
 
         String tagInput = etTags.getText().toString();
         String[] tagArray = tagInput.split("\\s*,\\s*");
-        List<String> tags = Arrays.asList(tagArray);
+        Map<String, Boolean> tags = new HashMap<>();
+        for (String tag : tagArray){
+            tags.put(tag, true);
+        }
 
         Note note = new Note(title, description, priority, tags);
 
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadNotes(View v) {
-        notebookRef.whereArrayContains("tags", "tag3").get()
+        notebookRef.whereEqualTo("tags.tag2", true).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
