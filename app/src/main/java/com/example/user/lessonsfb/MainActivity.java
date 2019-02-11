@@ -2,29 +2,27 @@ package com.example.user.lessonsfb;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.user.lessonsfb.model.Note;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 import com.google.firebase.firestore.WriteBatch;
-
-import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,27 +43,23 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initListener();
-        executeBatchWrite();
+        executeTransaction();
     }
 
-    private void executeBatchWrite() {
-        WriteBatch  batch = store.batch();
-        DocumentReference doc1 = notebookRef.document("New Note");
-        batch.set(doc1, new Note("New Title", "New Description", 1));
-
-        DocumentReference doc2 = notebookRef.document("p8EBxXzcqFmXgjJOZxPm");
-        batch.update(doc2, "title", "Updated Note");
-
-        DocumentReference doc3 = notebookRef.document("NOLS2Ooud6CSr3dqa0Uc");
-        batch.delete(doc3);
-
-        DocumentReference doc4 = notebookRef.document();
-        batch.set(doc4, new Note("Doc4", "Description Doc4", 4));
-
-        batch.commit().addOnFailureListener(new OnFailureListener() {
+    private void executeTransaction() {
+        store.runTransaction(new Transaction.Function<Long>() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                tvData.setText(e.toString());
+            public Long apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+                DocumentReference noteRef = notebookRef.document("New Note");
+                DocumentSnapshot documentSnapshot = transaction.get(noteRef);
+                long newPriority = documentSnapshot.getLong("priority") + 1;
+                transaction.update(noteRef, "priority", newPriority);
+                return newPriority;
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Long>() {
+            @Override
+            public void onSuccess(Long aLong) {
+                Toast.makeText(MainActivity.this, "New Priority: " + aLong, Toast.LENGTH_SHORT).show();
             }
         });
     }
